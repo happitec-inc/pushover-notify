@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "test-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  spm:
+    uses: happitec-inc/public-actions/.github/workflows/swift-test.yml@main
+    permissions:
+      contents: read
+    with:
+      runner: ${{ vars.RUNNER_MACOS || '["macos-26"]' }}

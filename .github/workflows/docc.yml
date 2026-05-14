@@ -1,0 +1,31 @@
+name: Deploy DocC
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  docs:
+    uses: happitec-inc/public-actions/.github/workflows/deploy-docc.yml@main
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    with:
+      target: notifyCore
+      hosting-base-path: pushover-notify
+      runner: ${{ vars.RUNNER_MACOS || '["macos-26"]' }}
+      # Override the canonical Apple renderer with our Mermaid-supporting
+      # fork so the agentic-workflow diagram in PushoverNotify.md renders.
+      docc-render-repo: happitec-inc/swift-docc-render
+      docc-render-ref: feature/mermaid-diagrams

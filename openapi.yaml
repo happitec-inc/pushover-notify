@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: Pushover API
+  version: 1.0.0
+  description: Minimal Pushover API specification for sending notifications with attachments
+servers:
+  - url: https://api.pushover.net/1
+    description: Pushover API server
+
+paths:
+  /messages.json:
+    post:
+      operationId: sendMessage
+      summary: Send a notification
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - token
+                - user
+                - message
+              properties:
+                token:
+                  type: string
+                  description: Application API token
+                user:
+                  type: string
+                  description: User key
+                message:
+                  type: string
+                  description: Notification message
+                attachment:
+                  type: string
+                  format: binary
+                  description: Image attachment
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  request:
+                    type: string
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
