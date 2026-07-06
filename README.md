@@ -80,9 +80,56 @@ fi
 - `--user-key <key>` (optional) - Override USER_KEY from config
 - `--api-token <token>` (optional) - Override API_TOKEN from config
 
+## Use as a library (Linux / AWS Lambda)
+
+`notifyCore` is exposed as a library product, so other Swift packages can send
+Pushover notifications directly instead of shelling out to the `notify` CLI.
+
+On **Linux** (for example an AWS Lambda on `provided.al2023`), don't rely on the
+default `URLSessionTransport` — `URLSession`'s multipart-upload support there is
+incomplete. Inject an `AsyncHTTPClientTransport` from
+[swift-openapi-async-http-client](https://github.com/swift-server/swift-openapi-async-http-client)
+instead. `sendNotification` takes an optional `transport` parameter for exactly this.
+
+Add both packages to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/happitec-inc/pushover-notify", from: "0.2.0"),
+    .package(url: "https://github.com/swift-server/swift-openapi-async-http-client", from: "1.0.0"),
+],
+targets: [
+    .executableTarget(
+        name: "YourLambda",
+        dependencies: [
+            .product(name: "notifyCore", package: "pushover-notify"),
+            .product(name: "OpenAPIAsyncHTTPClient", package: "swift-openapi-async-http-client"),
+        ]
+    ),
+]
+```
+
+Then send a notification, passing the AsyncHTTPClient transport:
+
+```swift
+import notifyCore
+import OpenAPIAsyncHTTPClient
+
+try await PushoverClient.sendNotification(
+    message: "Deploy finished",
+    attachmentPath: nil,   // or a path to a JPEG/PNG to attach
+    credentials: Credentials(userKey: "u-your-user-key", apiToken: "a-your-app-token"),
+    transport: AsyncHTTPClientTransport()
+)
+```
+
+On macOS the `transport` argument can be omitted — it defaults to
+`URLSessionTransport`, the same path the `notify` CLI uses.
+
 ## Requirements
 
-- macOS 13.0+
+- **CLI:** macOS 13.0+
+- **`notifyCore` library:** macOS 13.0+ or Linux (inject `AsyncHTTPClientTransport` on Linux, as above)
 - Swift 5.9+
 
 ## API Reference
