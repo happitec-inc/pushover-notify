@@ -23,16 +23,23 @@ public enum PushoverError: LocalizedError {
 }
 
 public struct PushoverClient {
-    /// Send a notification with optional attachment to Pushover API
+    /// Send a notification with optional attachment to Pushover API.
+    ///
+    /// - Parameter transport: The OpenAPI client transport to use. Defaults to
+    ///   `URLSessionTransport` (the CLI / macOS path). Linux consumers — e.g. an
+    ///   AWS Lambda that standardises on AsyncHTTPClient — should inject an
+    ///   `AsyncHTTPClientTransport`, where URLSession's multipart upload support
+    ///   is incomplete/unreliable.
     public static func sendNotification(
         message: String,
         attachmentPath: String?,
-        credentials: Credentials
+        credentials: Credentials,
+        transport: (any ClientTransport)? = nil
     ) async throws {
         // Create OpenAPI client
         let client = Client(
             serverURL: try Servers.Server1.url(),
-            transport: URLSessionTransport()
+            transport: transport ?? URLSessionTransport()
         )
 
         // Build multipart request body as array of parts

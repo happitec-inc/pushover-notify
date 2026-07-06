@@ -19,3 +19,12 @@ jobs:
       contents: read
     with:
       runner: ${{ vars.RUNNER_MACOS || '["macos-26"]' }}
+
+  # Proves notifyCore builds + tests on Linux, so it can be consumed as a
+  # library dependency from Linux targets (e.g. AWS Lambda / provided.al2023).
+  spm-linux:
+    uses: happitec-inc/public-actions/.github/workflows/swift-test.yml@main
+    permissions:
+      contents: read
+    with:
+      runner: ${{ vars.RUNNER_LINUX || '["ubuntu-latest"]' }}
