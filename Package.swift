@@ -6,6 +6,13 @@ let package = Package(
     platforms: [
         .macOS(.v13)
     ],
+    products: [
+        // Library product so other packages (e.g. Linux AWS Lambdas) can depend on
+        // the core notification logic instead of re-implementing a Pushover client.
+        .library(name: "notifyCore", targets: ["notifyCore"]),
+        // The CLI, exposed as a product for completeness / `swift run`.
+        .executable(name: "notify", targets: ["notify"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
         .package(url: "https://github.com/apple/swift-openapi-generator.git", from: "1.0.0"),
