@@ -36,6 +36,12 @@ paths:
                   type: string
                   format: binary
                   description: Image attachment
+                title:
+                  type: string
+                  description: Notification title
+                priority:
+                  type: string
+                  description: "Message priority as a string-encoded integer (-2..2); 1 = high (bypasses quiet hours)"
       responses:
         '200':
           description: Notification sent successfully
