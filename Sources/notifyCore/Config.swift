@@ -17,6 +17,14 @@ public enum ConfigError: LocalizedError, Equatable {
 public struct Credentials {
     public let userKey: String
     public let apiToken: String
+
+    /// Construct credentials directly. For programmatic consumers (e.g. a service
+    /// that loads the Pushover token/user from its own secret store) that don't go
+    /// through the config-file/CLI-argument `Config.loadCredentials` path.
+    public init(userKey: String, apiToken: String) {
+        self.userKey = userKey
+        self.apiToken = apiToken
+    }
 }
 
 public struct Config {
