@@ -30,10 +30,15 @@ public struct PushoverClient {
     ///   AWS Lambda that standardises on AsyncHTTPClient — should inject an
     ///   `AsyncHTTPClientTransport`, where URLSession's multipart upload support
     ///   is incomplete/unreliable.
+    /// - Parameter title: Optional notification title (Pushover `title`).
+    /// - Parameter priority: Optional Pushover priority (-2...2); `1` = high, which
+    ///   bypasses the recipient's quiet hours. Sent as a string-encoded integer.
     public static func sendNotification(
         message: String,
         attachmentPath: String?,
         credentials: Credentials,
+        title: String? = nil,
+        priority: Int? = nil,
         transport: (any ClientTransport)? = nil
     ) async throws {
         // Create OpenAPI client
@@ -54,6 +59,20 @@ public struct PushoverClient {
                 body: .init(message)
             )))
         ]
+
+        // Add optional title
+        if let title = title {
+            multipartParts.append(.title(.init(payload: .init(
+                body: .init(title)
+            ))))
+        }
+
+        // Add optional priority (string-encoded integer, per the Pushover form API)
+        if let priority = priority {
+            multipartParts.append(.priority(.init(payload: .init(
+                body: .init(String(priority))
+            ))))
+        }
 
         // Add attachment if provided
         if let attachmentPath = attachmentPath {
